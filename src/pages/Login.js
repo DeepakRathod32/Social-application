@@ -1,14 +1,15 @@
 import { useState } from 'react';
-import { toast, ToastContainer } from 'react-toastify';
-import "react-toastify/dist/ReactToastify.css";
+import { toast } from 'react-toastify';
 import styles from '../styles/login.module.css';
 import {useAuth} from '../hooks';
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loggingIn, setLoggingIn] = useState(false);
   const auth = useAuth();
+  const navigate = useNavigate();
   console.log(auth);
 
   const handleSubmit = async (e) => {
@@ -32,6 +33,10 @@ const Login = () => {
     return;
   }
 
+  if(auth.user){
+    navigate('/');
+  }
+
   return (
     <form className={styles.loginForm} onSubmit={handleSubmit}>
       <span className={styles.loginSignupHeader}>Log In</span>
@@ -41,6 +46,7 @@ const Login = () => {
           placeholder="Email"  
           value={email} 
           onChange={(e) => setEmail(e.target.value)}
+          required
         />
       </div>
 
@@ -49,11 +55,11 @@ const Login = () => {
         placeholder="password"  
         value={password} 
         onChange={(e) => setPassword(e.target.value)}
+        required
         />
       </div>
 
       <div className={styles.field} >
-        <ToastContainer/>
         <button disabled={loggingIn}>{loggingIn ? 'Logging in...' : 'Log In'}</button>
       </div>
     </form>

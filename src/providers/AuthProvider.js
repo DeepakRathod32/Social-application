@@ -8,11 +8,12 @@ const initialState = {
     logout: () => {},
     loading: true,
     signup: () => {},
-}
+    updateUser: () => {}
+};
 
 export const AuthContext = createContext(initialState);
 
 export const AuthProvider = ({children}) => {
     const auth = useProviderAuth();
     return <AuthContext.Provider value={auth}>{children}</AuthContext.Provider>
-}
+};

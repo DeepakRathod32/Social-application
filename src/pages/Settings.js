@@ -1,4 +1,5 @@
 import styles from "../styles/settings.module.css"
+import { toast } from 'react-toastify';
 import {useAuth} from "../hooks"
 import { useState } from "react";
 
@@ -10,8 +11,50 @@ const Settings = () => {
     const [savingForm, setSavingForm] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
 
-    const updateProfile = () => {
+    const clearForm = () => {
+        setPassword('');
+        setConfirmPassword('');
+    }
 
+    const updateProfile = async () => {
+        setSavingForm(true);
+
+        let error = false;
+        if(!name || !password || !confirmPassword){
+            toast.error('Please fill all the fields');
+
+            error = true;
+            setSavingForm(false);
+            return
+        }
+
+        if(password !== confirmPassword){
+            toast.error('password and confirm passwort do not matched.');
+
+            error = true;
+            setSavingForm(false);
+            return
+        }
+
+        if(error){
+            setSavingForm(false);
+        }
+
+        const response = await auth.updateUser(auth.user._id, name, password, confirmPassword);
+        console.log('setting response', response)
+        if(response.success){
+            setIsEditing(false);
+            setSavingForm(false);
+            clearForm();
+        console.log('@')
+
+            toast.success('User updated successfully');
+            console.log('@123@')
+        } else{
+            toast.error(response.message)
+        }
+        console.log('123')
+        setSavingForm(false);
     };
 
     return (
@@ -30,7 +73,7 @@ const Settings = () => {
 
             <div className={styles.field}>
                 <div className={styles.fieldLabel}>Name</div>
-                { isEditing ? <input type="text" value={name} onChange={(e)=>setName(e.target.value)}/> : <div className={styles.fieldValue}>{auth.user?.name}</div>}
+                { isEditing ? <input type="text" value={name} onChange={(e)=>setName(e.target.value)} required/> : <div className={styles.fieldValue}>{auth.user?.name}</div>}
             </div>
 
             { isEditing && (
@@ -40,6 +83,7 @@ const Settings = () => {
                         <input type="password" 
                             value={password}
                             onChange={(e)=>setPassword(e.target.value)}
+                            required
                             />
                     </div>
 
@@ -47,7 +91,10 @@ const Settings = () => {
                         <div className={styles.fieldLabel}>Confirm Password</div>
                         <input type="password" 
                             value={confirmPassword}
-                            onChange={(e)=>setConfirmPassword(e.target.value)}/>
+                            onChange={(e)=>setConfirmPassword(e.target.value)}
+                            required
+                            />
+                            
                     </div>
                 </>
             )}
@@ -55,7 +102,7 @@ const Settings = () => {
             <div className={styles.btnGrp}>
                 { isEditing ? (
                     <>
-                        <button className={` button ${styles.saveBtn}`} onClick={updateProfile}> {savingForm ? 'Saving Profile...' : 'Save Profile'} </button>
+                        <button className={` button ${styles.saveBtn}`} onClick={updateProfile} disabled={savingForm}> {savingForm ? 'Saving Profile...' : 'Save Profile'} </button>
                         <button className={` button ${styles.editBtn}`} onClick={()=>setIsEditing(false)}>Go Back</button>
                     </>
                     ) : (
