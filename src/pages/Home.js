@@ -3,29 +3,13 @@ import PropTypes from 'prop-types';
 import {Link} from 'react-router-dom';
 
 import { Comment, CreatePost, FriendsList, Loader } from '../components';
-import { useState, useEffect } from 'react';
-import { getPosts } from '../api';
-import { useAuth } from '../hooks';
+import { useAuth, usePosts } from '../hooks';
 
 const Home = () => {
-  const [loading, setLoading] = useState([]);
-  const [posts, setPosts] = useState([]);
   const auth = useAuth();
-
-  useEffect(() => {
-    const fetchPosts = async () => {
-      const response = await getPosts();
-      console.log('response', response);
-      if (response.success) {
-        setPosts(response.data.posts);
-      }
-      setLoading(false);
-    };
-
-    fetchPosts();
-  }, []);
-
-  if (loading) {
+  const posts = usePosts();
+ 
+  if (posts.loading) {
     return <Loader />;
   }
 
@@ -34,7 +18,7 @@ const Home = () => {
     <div className={styles.home}>
       <div className={styles.postsList}>
       <CreatePost/>
-        {posts.map((post) => {
+        {posts.data.map((post) => {
           return (
               <div className={styles.postWrapper} key={post._id}>
                 <div className={styles.postHeader}>
@@ -62,7 +46,7 @@ const Home = () => {
                         src="https://cdn-icons-png.flaticon.com/128/1077/1077035.png"
                         alt="likes-icon"
                       />
-                      <span>5</span>
+                      <span>{post.likes.length}</span>
                     </div>
 
                     <div className={styles.postCommentsIcon}>
